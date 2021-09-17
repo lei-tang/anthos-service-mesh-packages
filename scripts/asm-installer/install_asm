@@ -777,7 +777,7 @@ OPTIONS:
                                       used. Defaults to "mesh_ca" for --mode
                                       install. Specifying the CA is required
                                       for --mode migrate.  Allowed values for
-                                      <CA> are {citadel|mesh_ca|gcp_cas}.
+                                      <CA> are {citadel|mesh_ca|gcp_cas|zatar}.
   -o|--option            <FILE NAME>  The name of a YAML file in the kpt pkg to
                                       apply. For options, see the
                                       anthos-service-mesh-package GitHub
@@ -1206,12 +1206,12 @@ EOF
 
   if [[ "${MODE}" != "upgrade" ]]; then
     case "${CA}" in
-      citadel | mesh_ca | gcp_cas);;
+      citadel | mesh_ca | gcp_cas | zatar);;
       "")
         MISSING_ARGS=1
         warn "Missing value for CA"
         ;;
-      *) fatal "CA must be one of 'citadel', 'mesh_ca', 'gcp_cas'";;
+      *) fatal "CA must be one of 'citadel', 'mesh_ca', 'gcp_cas', 'zatar'";;
     esac
   fi
 
@@ -1307,6 +1307,8 @@ EOF
     ABS_OVERLAYS="${OPTIONS_DIRECTORY}/citadel-ca.yaml,${ABS_OVERLAYS}"
   elif [[ "${CA}" = "gcp_cas" ]]; then
     ABS_OVERLAYS="${OPTIONS_DIRECTORY}/private-ca.yaml,${ABS_OVERLAYS}"
+  elif [[ "${CA}" = "zatar" ]]; then
+    ABS_OVERLAYS="${OPTIONS_DIRECTORY}/zatar-ca.yaml,${ABS_OVERLAYS}"
   fi
   CUSTOM_OVERLAY="${ABS_OVERLAYS}"
 
@@ -1902,6 +1904,8 @@ validate_ca_consistency() {
     CURRENT_CA="mesh_ca"
   elif is_gcp_cas_installed; then
     CURRENT_CA="gcp_cas"
+  elif is_zatar_installed; then
+    CURRENT_CA="zatar"
   fi
 
   info "CA already in use: ${CURRENT_CA}"
@@ -1926,6 +1930,13 @@ is_gcp_cas_installed() {
   INSTALLED_CA_PROVIDER="$(kubectl -n istio-system get pod -l istio=ingressgateway \
     -o jsonpath='{.items[].spec.containers[].env[?(@.name=="CA_PROVIDER")].value}')"
   [[ "${INSTALLED_CA_PROVIDER}" = "GoogleCAS" ]] && return 0
+}
+
+is_zatar_installed() {
+  local INSTALLED_CA_PROVIDER
+  INSTALLED_CA_PROVIDER="$(kubectl -n istio-system get pod -l istio=ingressgateway \
+    -o jsonpath='{.items[].spec.containers[].env[?(@.name=="CA_PROVIDER")].value}')"
+  [[ "${INSTALLED_CA_PROVIDER}" = "GoogleZatar" ]] && return 0
 }
 
 bind_user_to_iam_policy(){
