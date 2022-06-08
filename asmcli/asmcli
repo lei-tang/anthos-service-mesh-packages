@@ -5414,7 +5414,7 @@ EOF
   fi
 }
 
-exit_if_no_auth_token() {
+x_exit_if_no_auth_token() {
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
   if [[ -z "${AUTHTOKEN}" ]]; then
     { read -r -d '' MSG; validation_error "${MSG}"; } <<EOF || true
@@ -5545,7 +5545,7 @@ x_enable_workload_certificate_on_fleet() {
   local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
 
   info "Enabling the workload identity platform on ${FLEET_ID} ..."
-  exit_if_no_auth_token
+  x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
   # gcloud command is not ready yet, use curl command instead.
@@ -5570,7 +5570,7 @@ x_enable_workload_certificate_on_membership() {
   local MEMBERSHIP_NAME; MEMBERSHIP_NAME="${3}"
 
   info "Enabling the workload identity platform certificate for the membership ${MEMBERSHIP_NAME}  ..."
-  exit_if_no_auth_token
+  x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
 

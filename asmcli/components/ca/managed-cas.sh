@@ -35,12 +35,22 @@ x_enable_workload_certificate_api() {
   retry 2 run_command gcloud services enable --project="${FLEET_ID}" "${WORKLOAD_CERT_API}"
 }
 
+x_exit_if_no_auth_token() {
+  local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
+  if [[ -z "${AUTHTOKEN}" ]]; then
+    { read -r -d '' MSG; validation_error "${MSG}"; } <<EOF || true
+Auth token is not obtained successfully. Please login and
+retry, e.g., run 'gcloud auth application-default login' to login.
+EOF
+  fi
+}
+
 x_enable_workload_certificate_on_fleet() {
   local GKEHUB_API; GKEHUB_API="$1"
   local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
 
   info "Enabling the workload identity platform on ${FLEET_ID} ..."
-  exit_if_no_auth_token
+  x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
   # gcloud command is not ready yet, use curl command instead.
@@ -65,7 +75,7 @@ x_enable_workload_certificate_on_membership() {
   local MEMBERSHIP_NAME; MEMBERSHIP_NAME="${3}"
 
   info "Enabling the workload identity platform certificate for the membership ${MEMBERSHIP_NAME}  ..."
-  exit_if_no_auth_token
+  x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
 
