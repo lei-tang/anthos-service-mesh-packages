@@ -18,3 +18,12 @@ x_configure_managed_cas() {
 
   configure_trust_domain_aliases
 }
+
+x_enable_workload_certificate_api() {
+  local GKEHUB_API; GKEHUB_API="$1"
+  local WORKLOAD_CERT_API; WORKLOAD_CERT_API="$2"
+  local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
+
+  info "Enabling the workload identity API for ${FLEET_ID} ..."
+  retry 2 run_command gcloud services enable --project="${FLEET_ID}" "${GKEHUB_API}" "${WORKLOAD_CERT_API}"
+}
