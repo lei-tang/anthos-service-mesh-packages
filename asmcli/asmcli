@@ -1876,7 +1876,7 @@ validate_dependencies() {
       if needs_service_mesh_feature; then
         enable_service_mesh_feature
       fi
-      if [[ "${CA}" = "managed_cas" ]]; then
+      if [[ "${CA}" == "managed_cas" ]]; then
         enable_workload_certificate_on_fleet "autopush-gkehub.sandbox.googleapis.com"
       fi
     else
@@ -1893,7 +1893,7 @@ validate_dependencies() {
     exit_if_cluster_unregistered
     exit_if_hub_membership_is_empty
     local HUB_MEMBERSHIP_ID; HUB_MEMBERSHIP_ID="$(context_get-option "HUB_MEMBERSHIP_ID")"
-    if [[ "${CA}" = "managed_cas" ]]; then
+    if [[ "${CA}" == "managed_cas" ]]; then
       enable_workload_certificate_on_membership "autopush-gkehub.sandbox.googleapis.com" "${FLEET_ID}" "${HUB_MEMBERSHIP_ID}"
     fi
   elif should_validate && [[ "${USE_HUB_WIP}" -eq 1 || "${USE_VM}" -eq 1 ]]; then
@@ -2283,7 +2283,7 @@ install_managed_control_plane() {
     install_managed_privateca
   fi
 
-  if [[ "${CA}" = "managed_cas" ]]; then
+  if [[ "${CA}" == "managed_cas" ]]; then
     install_managed_cas_for_mcp
   fi
 
@@ -2540,7 +2540,7 @@ is_managed_cas_installed() {
   local INSTALLED_CA_PROVIDER
   INSTALLED_CA_PROVIDER="$(kubectl -n istio-system get pod -l istio=ingressgateway \
     -o jsonpath='{.items[].spec.containers[].env[?(@.name=="CA_PROVIDER")].value}')"
-  [[ "${INSTALLED_CA_PROVIDER}" = "managed_cas" ]] && return 0
+  [[ "${INSTALLED_CA_PROVIDER}" == "managed_cas" ]] && return 0
 }
 
 is_cluster_registered() {
@@ -3483,7 +3483,7 @@ enable_gcloud_apis(){
   retry 3 gcloud services enable --project="${PROJECT_ID}" $(required_apis | tr '\n' ' ')
 
   local CA; CA="$(context_get-option "CA")"
-  if [[ "${CA}" = "managed_cas" ]]; then
+  if [[ "${CA}" == "managed_cas" ]]; then
     x_enable_gke_hub_api "autopush-gkehub.sandbox.googleapis.com"
     x_enable_workload_certificate_api "staging-workloadcertificate.sandbox.googleapis.com"
     # As autopush is used, also enable autopush of meshconfig.

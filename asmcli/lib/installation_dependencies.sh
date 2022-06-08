@@ -174,7 +174,7 @@ enable_gcloud_apis(){
   retry 3 gcloud services enable --project="${PROJECT_ID}" $(required_apis | tr '\n' ' ')
 
   local CA; CA="$(context_get-option "CA")"
-  if [[ "${CA}" = "managed_cas" ]]; then
+  if [[ "${CA}" == "managed_cas" ]]; then
     x_enable_gke_hub_api "autopush-gkehub.sandbox.googleapis.com"
     x_enable_workload_certificate_api "staging-workloadcertificate.sandbox.googleapis.com"
     # As autopush is used, also enable autopush of meshconfig.
