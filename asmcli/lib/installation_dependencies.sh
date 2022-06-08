@@ -173,6 +173,18 @@ enable_gcloud_apis(){
   # shellcheck disable=SC2046
   retry 3 gcloud services enable --project="${PROJECT_ID}" $(required_apis | tr '\n' ' ')
 
+  local CA; CA="$(context_get-option "CA")"
+  if [[ "${CA}" = "managed_cas" ]]; then
+    x_enable_gke_hub_api "autopush-gkehub.sandbox.googleapis.com"
+    x_enable_workload_certificate_api "staging-workloadcertificate.sandbox.googleapis.com"
+    # As autopush is used, also enable autopush of meshconfig.
+    # When production version is used, these code can be removed.
+    # https://g3doc.corp.google.com/cloud/csm/config/g3doc/projects/controller/user_guide.md?cl=head
+    # Enable the API. Staging meshconfig is required since MCP Provisioning uses it.
+    retry 2 gcloud services enable --project=${FLEET_ID} autopush-meshconfig.sandbox.googleapis.com staging-meshconfig.sandbox.googleapis.com
+    retry 2 gcloud config set api_endpoint_overrides/gkehub "https://autopush-gkehub.sandbox.googleapis.com/"
+  fi
+
   if [[ "${FLEET_ID}" != "${PROJECT_ID}" ]]; then
     local REQUIRED_FLEET_APIS; REQUIRED_FLEET_APIS="$(required_fleet_apis | tr '\n' ' ')"
     if [[ -n "${REQUIRED_FLEET_APIS// }" ]]; then
