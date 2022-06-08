@@ -34,3 +34,54 @@ x_enable_workload_certificate_api() {
   info "Enabling the workload certificate API for ${FLEET_ID} ..."
   retry 2 run_command gcloud services enable --project="${FLEET_ID}" "${WORKLOAD_CERT_API}"
 }
+
+x_enable_workload_certificate_on_fleet() {
+  local GKEHUB_API; GKEHUB_API="$1"
+  local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
+
+  info "Enabling the workload identity platform on ${FLEET_ID} ..."
+  exit_if_no_auth_token
+  local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
+
+  # gcloud command is not ready yet, use curl command instead.
+  # retry 2 run_command gcloud alpha container fleet workload-certificate enable --provision-google-ca --project="${FLEET_ID}"
+  local BODY; BODY="{
+    'spec': {
+      'workloadcertificate': {
+        'provision_google_ca': 'ENABLED'
+      }
+    }
+  }"
+
+  curl -H "Authorization: Bearer ${AUTHTOKEN}" \
+      -X POST -H "Content-Type: application/json" -H "Accept: application/json" \
+      -d "${BODY}" \
+      "https://${GKEHUB_API}/v1alpha/projects/${FLEET_ID}/locations/global/features?feature_id=workloadcertificate"
+}
+
+x_enable_workload_certificate_on_membership() {
+  local GKEHUB_API; GKEHUB_API="${1}"
+  local FLEET_ID; FLEET_ID="${2}"
+  local MEMBERSHIP_NAME; MEMBERSHIP_NAME="${3}"
+
+  info "Enabling the workload identity platform certificate for the membership ${MEMBERSHIP_NAME}  ..."
+  exit_if_no_auth_token
+  local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
+
+
+  # gcloud command is not ready yet, use curl command instead
+  # retry 2 run_command gcloud alpha container fleet workload-certificate update --memberships="${MEMBERSHIP_NAME}" --enable --project="${FLEET_ID}"
+  ENABLEFEATURE="{
+    'membership_specs': {
+      'projects/${FLEET_ID}/locations/global/memberships/${MEMBERSHIP_NAME}': {
+        'workloadcertificate': {
+          'certificate_management': 'ENABLED'
+        }
+      }
+    }
+  }"
+
+  curl -H "Authorization: Bearer ${AUTHTOKEN}" \
+     -X PATCH -H "Content-Type: application/json" -H "Accept: application/json" \
+     -d "${ENABLEFEATURE}" "https://${GKEHUB_API}/v1alpha/projects/${FLEET_ID}/locations/global/features/workloadcertificate?update_mask=membership_specs"
+}

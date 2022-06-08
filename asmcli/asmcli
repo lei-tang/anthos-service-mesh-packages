@@ -1877,7 +1877,7 @@ validate_dependencies() {
         enable_service_mesh_feature
       fi
       if [[ "${CA}" == "managed_cas" ]]; then
-        enable_workload_certificate_on_fleet "autopush-gkehub.sandbox.googleapis.com"
+        x_enable_workload_certificate_on_fleet "autopush-gkehub.sandbox.googleapis.com"
       fi
     else
       exit_if_no_workload_identity
@@ -1894,7 +1894,7 @@ validate_dependencies() {
     exit_if_hub_membership_is_empty
     local HUB_MEMBERSHIP_ID; HUB_MEMBERSHIP_ID="$(context_get-option "HUB_MEMBERSHIP_ID")"
     if [[ "${CA}" == "managed_cas" ]]; then
-      enable_workload_certificate_on_membership "autopush-gkehub.sandbox.googleapis.com" "${FLEET_ID}" "${HUB_MEMBERSHIP_ID}"
+      x_enable_workload_certificate_on_membership "autopush-gkehub.sandbox.googleapis.com" "${FLEET_ID}" "${HUB_MEMBERSHIP_ID}"
     fi
   elif should_validate && [[ "${USE_HUB_WIP}" -eq 1 || "${USE_VM}" -eq 1 ]]; then
     exit_if_cluster_unregistered
@@ -5419,7 +5419,7 @@ exit_if_no_auth_token() {
   if [[ -z "${AUTHTOKEN}" ]]; then
     { read -r -d '' MSG; validation_error "${MSG}"; } <<EOF || true
 Auth token is not obtained successfully. Please login and
-retry, e.g., run 'gcloud auth application-default login` to login.
+retry, e.g., run 'gcloud auth application-default login' to login.
 EOF
   fi
 }
@@ -5540,7 +5540,7 @@ x_enable_workload_certificate_api() {
   retry 2 run_command gcloud services enable --project="${FLEET_ID}" "${WORKLOAD_CERT_API}"
 }
 
-enable_workload_certificate_on_fleet() {
+x_enable_workload_certificate_on_fleet() {
   local GKEHUB_API; GKEHUB_API="$1"
   local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
 
@@ -5564,7 +5564,7 @@ enable_workload_certificate_on_fleet() {
       "https://${GKEHUB_API}/v1alpha/projects/${FLEET_ID}/locations/global/features?feature_id=workloadcertificate"
 }
 
-enable_workload_certificate_on_membership() {
+x_enable_workload_certificate_on_membership() {
   local GKEHUB_API; GKEHUB_API="${1}"
   local FLEET_ID; FLEET_ID="${2}"
   local MEMBERSHIP_NAME; MEMBERSHIP_NAME="${3}"
