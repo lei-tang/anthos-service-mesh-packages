@@ -5576,7 +5576,7 @@ x_enable_workload_certificate_on_membership() {
 
   # gcloud command is not ready yet, use curl command instead
   # retry 2 run_command gcloud alpha container fleet workload-certificate update --memberships="${MEMBERSHIP_NAME}" --enable --project="${FLEET_ID}"
-  ENABLEFEATURE="{
+  local ENABLEFEATURE; ENABLEFEATURE="{
     'membership_specs': {
       'projects/${FLEET_ID}/locations/global/memberships/${MEMBERSHIP_NAME}': {
         'workloadcertificate': {
