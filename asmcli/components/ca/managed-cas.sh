@@ -74,10 +74,9 @@ x_enable_workload_certificate_on_membership() {
   local FLEET_ID; FLEET_ID="${2}"
   local MEMBERSHIP_NAME; MEMBERSHIP_NAME="${3}"
 
-  info "Enabling the workload identity platform certificate for the membership ${MEMBERSHIP_NAME}  ..."
+  info "Enabling the workload certificate for the membership ${MEMBERSHIP_NAME}  ..."
   x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
-
 
   # gcloud command is not ready yet, use curl command instead
   # retry 2 run_command gcloud alpha container fleet workload-certificate update --memberships="${MEMBERSHIP_NAME}" --enable --project="${FLEET_ID}"
