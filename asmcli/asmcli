@@ -2284,7 +2284,7 @@ install_managed_control_plane() {
   fi
 
   if [[ "${CA}" == "managed_cas" ]]; then
-    install_managed_cas_for_mcp
+    x_install_managed_cas_for_mcp
   fi
 
   install_managed_startup_config
@@ -2400,7 +2400,7 @@ install_managed_privateca() {
   context_append "mcpOptions" "CAAddr=${CA_NAME}"
 }
 
-install_managed_cas_for_mcp() {
+x_install_managed_cas_for_mcp() {
   info "Configuring managed CAS for managed control plane..."
 
   context_append "mcpOptions" "CA=MANAGEDCAS"
