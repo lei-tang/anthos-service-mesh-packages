@@ -5548,8 +5548,6 @@ x_enable_workload_certificate_on_fleet() {
   x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
-  # gcloud command is not ready yet, use curl command instead.
-  # retry 2 run_command gcloud alpha container fleet workload-certificate enable --provision-google-ca --project="${FLEET_ID}"
   local BODY; BODY="{
     'spec': {
       'workloadcertificate': {
@@ -5573,9 +5571,6 @@ x_enable_workload_certificate_on_membership() {
   x_exit_if_no_auth_token
   local AUTHTOKEN; AUTHTOKEN="$(get_auth_token)"
 
-
-  # gcloud command is not ready yet, use curl command instead
-  # retry 2 run_command gcloud alpha container fleet workload-certificate update --memberships="${MEMBERSHIP_NAME}" --enable --project="${FLEET_ID}"
   local ENABLEFEATURE; ENABLEFEATURE="{
     'membership_specs': {
       'projects/${FLEET_ID}/locations/global/memberships/${MEMBERSHIP_NAME}': {
